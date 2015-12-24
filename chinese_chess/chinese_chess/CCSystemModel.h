@@ -9,6 +9,7 @@
 #import <Foundation/Foundation.h>
 #import "XZChessPiece.h"
 #import "common.h"
+#import "CCActionQueue.h"
 
 
 
@@ -26,7 +27,7 @@
 @property(nonatomic,assign)CCPLAY_MODEL_t playModel; //下棋模式(分局域网对战，人机对象，棋路研究等各种模式)
 @property(nonatomic,assign)BOOL stop; //非活跃状态 ,即是否开始下棋
 @property(nonatomic,assign)BOOL pause; //暂停状态
-
+@property(nonatomic,retain)CCActionQueue* actionQueue;  //动作序列容器,用于后退，前进
 
 //初始化系统模型,  参数说明:  role： 代表己方角色值,  playModel： 下棋模式: 分为打谱，人机对弈，局域网对战，连网对战
 -(id)initWithRole:(CCROLE_t)role andPlayModel:(CCPLAY_MODEL_t)playModel;
@@ -54,12 +55,23 @@
 -(CCSITUATION_TYPE_t)checkForSituationIfTheChessPiece:(XZChessPiece *)cp killAnther:(XZChessPiece*)anther;
 
 //  在模型中,移动一颗棋子的过程
--(void)moveChessPiece:(XZChessPiece*)cp toPosition:(CCPos_t)position;
+-(void)actionChessPiece:(XZChessPiece*)cp moveToPosition:(CCPos_t)position;
 
 //  在模型中，吃掉一颗棋子的过程
--(void)replaceChessPiece:(XZChessPiece*)cp withAnther:(XZChessPiece*)anther;
+-(void)actionChessPiece:(XZChessPiece*)cp replaceWithAnther:(XZChessPiece*)anther;
 
 // 交换角色下棋
 -(void)exchangeRole;
+
+// 后退一步
+-(CCActionStep*)backStep;
+
+//前进一步
+-(CCActionStep*)forwardStep;
+
+
+// 生成棋盘
+-(NSArray*)expressListOfAllSteps;
+
 
 @end

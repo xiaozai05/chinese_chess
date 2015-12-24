@@ -13,12 +13,15 @@
 
 //棋子视图类
 @interface CPView : UIView
-
+{
+    @private
+    BOOL _selectStatus;
+}
 
 @property(nonatomic,retain)UIImage* selectImage; //棋子选中时的图片
 @property(nonatomic,retain)UIImage* image; //棋子非选中时的图片
 @property(nonatomic,assign)CCPos_t position;//在象棋逻辑矩阵中的下标坐标
-
+@property(nonatomic,readonly,assign,getter=isSelected)BOOL selectStatus;
 // 棋子视图设置为非选中状态
 -(void)becomeUnselected;
 // 棋子视图设置为选中状态

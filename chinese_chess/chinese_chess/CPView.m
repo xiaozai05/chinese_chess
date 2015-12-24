@@ -16,6 +16,7 @@
     if (self) {
         self.autoresizesSubviews=YES; //自动缩放子视图
         self.userInteractionEnabled=YES; //打开用户交互，需要响应手势
+        self->_selectStatus=NO;
     }
     return self;
 }
@@ -24,17 +25,20 @@
     if (self=[super init]) {
         self.autoresizesSubviews=YES;
         self.userInteractionEnabled=YES;
+        self->_selectStatus=NO;
     }
     return self;
 }
 
 #pragma mark -棋子视图设置为选中状态
 -(void)becomeSelected{
+    self->_selectStatus=YES;
     self.layer.contents=(id)self.selectImage.CGImage;
 }
 
 #pragma mark -棋子视图设置为非选中状态
 -(void)becomeUnselected{
+    self->_selectStatus=NO;
     self.layer.contents=(id)self.image.CGImage;
 }
 

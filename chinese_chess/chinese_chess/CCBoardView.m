@@ -79,4 +79,22 @@
 }
 
 
+-(CPView *)viewWithPosition:(CCPos_t)position{
+    for (CPView* view in self.subviews) {
+        if (view.position.x==position.x && view.position.y==position.y) {
+            return view;
+        }
+    }
+    return nil;
+}
+
+-(CPView *)viewIsSelected{
+    for (CPView* view  in self.subviews) {
+        if ([view isSelected]) {
+            return view;
+        }
+    }
+    return nil;
+}
+
 @end

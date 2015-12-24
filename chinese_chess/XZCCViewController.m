@@ -11,11 +11,13 @@
 #import "CCBoardView.h"
 #import "XZButton.h"
 #import "MBProgressHUD.h"
+#import "ExpressView.h"
+
 
 #import "Tools.h"
 #import "RoleView.h"
 
-@interface XZCCViewController () <CCBoardViewDataSource>
+@interface XZCCViewController () <CCBoardViewDataSource, UITableViewDelegate,UITableViewDataSource>
 
 @property(nonatomic,retain)CCSystemModel* model; //模型
 @property(nonatomic,retain)UIView * topRect; // 棋盘上方区域
@@ -104,16 +106,19 @@
     // 回退按钮
     XZButton* undoBtn =[XZButton buttonWithType:UIButtonTypeRoundedRect andTitle:@"回 退"];
     [fatherView addSubview:undoBtn];
+    [undoBtn addTarget:self action:@selector(undoButtonClicked:) forControlEvents:UIControlEventTouchUpInside];
     undoBtn.translatesAutoresizingMaskIntoConstraints=NO;
     
     // 前进按钮
     XZButton* redoBtn = [XZButton buttonWithType:UIButtonTypeRoundedRect andTitle:@"前 进"];
     [fatherView addSubview:redoBtn];
+    [redoBtn addTarget:self action:@selector(redoButtonClicked:) forControlEvents:UIControlEventTouchUpInside];
     redoBtn.translatesAutoresizingMaskIntoConstraints=NO;
     
     // 自动前进按钮
     XZButton* autoBtn =[XZButton buttonWithType:UIButtonTypeRoundedRect andTitle:@"自 动"];
     [fatherView addSubview:autoBtn];
+    [autoBtn addTarget:self action:@selector(autoButtonClicked:) forControlEvents:UIControlEventTouchUpInside];
     autoBtn.translatesAutoresizingMaskIntoConstraints=NO;
     
     //使用约束布局三个按钮
@@ -127,6 +132,53 @@
     }
 }
 
+// 回退响应
+-(void)undoButtonClicked:(UIButton*)btn{
+    CCActionStep* step = [self.model backStep];
+    if (!step) {
+        return;
+    }
+    [self exchangeCPView:(CPView*)[self.boardView viewWithTag:step.tag] andAntherCPView:[self.boardView viewWithPosition:step.srcPosition]];
+    [[self.boardView viewIsSelected] becomeUnselected];
+    CPView* view = (CPView*)[self.boardView viewWithTag:step.tag];
+    [view becomeSelected];
+//    NSLog(@"view.tag=%li",view.tag);
+//    NSLog(@"view的名称:%@",[_model chessPieceForTag:view.tag].cpName);
+    if (step.actType==CCACTION_REPLACE){
+        CPView* deadView = (CPView*)[self.boardView viewWithTag:step.tagOfBeKilled];
+        [deadView becomeUnselected];
+    }
+}
+
+// 前进响应
+-(void)redoButtonClicked:(UIButton*)btn{
+    [self forwardStep:nil];
+}
+
+-(BOOL)forwardStep:(NSTimer*)timer{
+    NSLog(@"定时器在调用...");
+   CCActionStep* step =  [self.model forwardStep];
+    if (!step) {
+        if (timer) {
+            [timer invalidate];
+        }
+        return NO;
+    }
+    [[self.boardView viewIsSelected] becomeUnselected];
+    CPView* view1 = (CPView*)[self.boardView viewWithTag:step.tag];
+    CPView* view2 = (CPView*)[self.boardView viewWithPosition:step.dstPosition];
+    [self exchangeCPView:view1 andAntherCPView:view2];
+    [view1 becomeSelected];
+    if (step.actType==CCACTION_REPLACE) {
+        [view2 disappear];
+    }
+    return YES;
+}
+
+// 自动前进响应
+-(void)autoButtonClicked:(UIButton*)btn{
+    [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(forwardStep:) userInfo:nil repeats:YES];
+}
 
 //创建顶部按钮
 -(void)createTopButtons{
@@ -145,6 +197,7 @@
     //棋谱按钮
     XZButton* traceBtn =[XZButton buttonWithType:UIButtonTypeRoundedRect andTitle:@"棋 谱"];
     [fatherView addSubview:traceBtn];
+    [traceBtn addTarget:self action:@selector(traceButtonClicked:) forControlEvents:UIControlEventTouchUpInside];
     traceBtn.translatesAutoresizingMaskIntoConstraints=NO;
     
     //跳转按钮
@@ -168,6 +221,17 @@
     }
 }
 
+-(void)traceButtonClicked:(UIButton*)btn{
+    NSArray* array = [self.model expressListOfAllSteps];
+    for (NSString* express in array) {
+        NSLog(@"棋谱:%@",express);
+    }
+    ExpressView * view =[[ExpressView alloc]initWithDelegate:self andDataSource:self];
+    view.center=self.view.center;
+    [self.view addSubview:view];
+   
+}
+
 
 // 返回按钮
 -(void)backButtonClicked:(UIButton*)btn{
@@ -181,6 +245,7 @@
 //    NSLog(@"视图宽:%f,高:%f\n",self.view.bounds.size.width,self.view.bounds.size.height);
     [self createData];//创建数据模型
     [self createUI]; //创建UI
+    [self registerInNotificationCenter];
 }
 
 
@@ -249,16 +314,17 @@
                 // 如果吃子成功
                 if(analyseResult==CCANALYSE_RESULT_OK||analyseResult== CCANALYSE_WILL_KILL_ENEMY){
                     result=YES;
-                    [_model replaceChessPiece:cp withAnther:_model.currentCP];
-                    //被吃掉的棋子的视图要消失
-                    [view disappear];
+                    [_model actionChessPiece:cp replaceWithAnther:_model.currentCP];
+                    
                     CPView* activeView = (CPView*)[self.boardView viewWithTag:_model.currentCP.tag];
                     //交换两个视图的属性
                     [self exchangeCPView:activeView andAntherCPView:view];
+                    //被吃掉的棋子的视图要消失
+                    [view disappear];
                     if (analyseResult==CCANALYSE_WILL_KILL_ENEMY) {
                         [Tools showSpinnerInView:self.view prompt:@"x将军" delay:2];
                     }
-                    [self.roleRect turnRole];
+//                    [self.roleRect turnRole];
                 }else if( analyseResult==CCANALYSE_WILL_BE_KILLED){
                     [Tools showSpinnerInView:self.view prompt:@"已被将军" delay:2];
                 }
@@ -279,11 +345,11 @@
         
         if(analyseResult==CCANALYSE_RESULT_OK||analyseResult==CCANALYSE_WILL_KILL_ENEMY){
             result=YES;
-            [_model moveChessPiece:_model.currentCP toPosition:view.position];
+            [_model actionChessPiece:_model.currentCP moveToPosition:view.position];
             CPView* activeView = (CPView*)[self.boardView viewWithTag:_model.currentCP.tag];
             // 交换两个棋子视图的中心点，整型坐标值等
             [self exchangeCPView:activeView andAntherCPView:view];
-            [self.roleRect turnRole];
+//            [self.roleRect turnRole];
             if (analyseResult==CCANALYSE_WILL_KILL_ENEMY) {
                 [Tools showSpinnerInView:self.view prompt:@"将军" delay:2];
             }
@@ -298,6 +364,8 @@
 
 #pragma mark -交换两个棋子视图的位置和逻辑坐标
 -(void)exchangeCPView:(CPView*)view andAntherCPView:(CPView*)anther{
+
+#if 0
     CGPoint temp=view.center;
     CCPos_t tempPos=view.position;
     //采用block动画
@@ -307,6 +375,18 @@
         anther.center=temp;
         anther.position=tempPos;
     }];
+#else
+    CCPos_t temPos = view.position;
+    view.position=anther.position;
+    anther.position=temPos;
+    
+    CGPoint temp = anther.center;
+    anther.center=view.center;
+    [UIView beginAnimations:@"replace view" context:nil];
+    [UIView setAnimationDuration:0.3];
+    view.center=temp;
+    [UIView commitAnimations];
+#endif
 }
 
 
@@ -359,6 +439,37 @@
     UITapGestureRecognizer* tap = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(respondCPViewClicked:)];
     [view addGestureRecognizer:tap];
 
+}
+
+
+-(void)getNotification:(NSNotification*)notification{
+   NSNumber* num =[notification.userInfo objectForKey:@"isRed"];
+    BOOL isRed = [num boolValue];
+    if (isRed) {
+        [self.roleRect displayRedRole];
+    }else{
+        [self.roleRect displayGreenRole];
+    }
+}
+
+-(void)registerInNotificationCenter{
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(getNotification:) name:@"角色切换" object:nil];
+}
+
+#pragma mark -数据源代理方法
+-(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
+    return [self.model expressListOfAllSteps].count;
+}
+
+
+-(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
+    UITableViewCell* cell = [tableView dequeueReusableCellWithIdentifier:@"reuse"];
+    if (!cell) {
+        cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"reuse"];
+    }
+    cell.textLabel.text=[self.model expressListOfAllSteps][indexPath.row];
+    cell.textLabel.textAlignment=NSTextAlignmentCenter;
+    return cell;
 }
 
 @end

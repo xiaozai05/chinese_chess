@@ -74,6 +74,15 @@ typedef enum {
 
 
 
+//动作类型
+typedef enum {
+    CCACTION_MOVE=1,  //移动
+    CCACTION_REPLACE, //吃子
+}CCACTION_TYPE_t;
+
+
+#define NUMBERS @[@"零",@"一",@"二",@"三",@"四",@"五",@"六",@"七",@"八",@"九",@"十"]
+
 
 //棋子数量
 #define CPTOTAL 32

@@ -34,5 +34,8 @@
 -(id)initWithDataSource:(id<CCBoardViewDataSource>)dataSource;
 -(id)initWithFrame:(CGRect)frame andDataSource:(id<CCBoardViewDataSource>)dataSource;
 
+-(CPView*)viewWithPosition:(CCPos_t)position;
+-(CPView*)viewIsSelected;
+
 
 @end

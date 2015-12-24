@@ -15,7 +15,6 @@
 
 @implementation HomeViewController
 -(void)createButtons{
-    NSLog(@"创建button\n");
     UIButton* button1 =[UIButton buttonWithType:UIButtonTypeRoundedRect];
     button1.layer.cornerRadius=3;
     button1.backgroundColor=[UIColor colorWithRed:0.160 green:0.529 blue:1.000 alpha:1.000];

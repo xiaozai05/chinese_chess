@@ -22,6 +22,9 @@
 		82532E221C26485900A80448 /* XZVSViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 82532E211C26485900A80448 /* XZVSViewController.m */; };
 		82532E241C264BD800A80448 /* ccicon.png in Resources */ = {isa = PBXBuildFile; fileRef = 82532E231C264BD800A80448 /* ccicon.png */; };
 		82532E271C264E1700A80448 /* RoleView.m in Sources */ = {isa = PBXBuildFile; fileRef = 82532E261C264E1700A80448 /* RoleView.m */; };
+		827A3D331C2B8E8A00FE80F5 /* CCActionStep.m in Sources */ = {isa = PBXBuildFile; fileRef = 827A3D321C2B8E8A00FE80F5 /* CCActionStep.m */; };
+		827A3D361C2B8FFB00FE80F5 /* CCActionQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 827A3D351C2B8FFB00FE80F5 /* CCActionQueue.m */; };
+		827A3D391C2BE55A00FE80F5 /* ExpressView.m in Sources */ = {isa = PBXBuildFile; fileRef = 827A3D381C2BE55A00FE80F5 /* ExpressView.m */; };
 		829514611C1E6F880071E634 /* board.jpeg in Resources */ = {isa = PBXBuildFile; fileRef = 829514601C1E6F880071E634 /* board.jpeg */; };
 		829514641C1E8FAB0071E634 /* XZCPMarshal.m in Sources */ = {isa = PBXBuildFile; fileRef = 829514631C1E8FAB0071E634 /* XZCPMarshal.m */; };
 		829514671C1E8FE30071E634 /* XZCPSergeancy.m in Sources */ = {isa = PBXBuildFile; fileRef = 829514661C1E8FE30071E634 /* XZCPSergeancy.m */; };
@@ -75,6 +78,12 @@
 		82532E231C264BD800A80448 /* ccicon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = ccicon.png; sourceTree = "<group>"; };
 		82532E251C264E1700A80448 /* RoleView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RoleView.h; sourceTree = "<group>"; };
 		82532E261C264E1700A80448 /* RoleView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RoleView.m; sourceTree = "<group>"; };
+		827A3D311C2B8E8A00FE80F5 /* CCActionStep.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CCActionStep.h; sourceTree = "<group>"; };
+		827A3D321C2B8E8A00FE80F5 /* CCActionStep.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CCActionStep.m; sourceTree = "<group>"; };
+		827A3D341C2B8FFB00FE80F5 /* CCActionQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CCActionQueue.h; sourceTree = "<group>"; };
+		827A3D351C2B8FFB00FE80F5 /* CCActionQueue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CCActionQueue.m; sourceTree = "<group>"; };
+		827A3D371C2BE55A00FE80F5 /* ExpressView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExpressView.h; sourceTree = "<group>"; };
+		827A3D381C2BE55A00FE80F5 /* ExpressView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ExpressView.m; sourceTree = "<group>"; };
 		8295145F1C1E638B0071E634 /* common.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = common.h; sourceTree = "<group>"; };
 		829514601C1E6F880071E634 /* board.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = board.jpeg; sourceTree = "<group>"; };
 		829514621C1E8FAB0071E634 /* XZCPMarshal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XZCPMarshal.h; sourceTree = "<group>"; };
@@ -175,6 +184,10 @@
 				829514631C1E8FAB0071E634 /* XZCPMarshal.m */,
 				82EBEA111C1867FC007515C2 /* CCSystemModel.h */,
 				82EBEA121C1867FC007515C2 /* CCSystemModel.m */,
+				827A3D311C2B8E8A00FE80F5 /* CCActionStep.h */,
+				827A3D321C2B8E8A00FE80F5 /* CCActionStep.m */,
+				827A3D341C2B8FFB00FE80F5 /* CCActionQueue.h */,
+				827A3D351C2B8FFB00FE80F5 /* CCActionQueue.m */,
 			);
 			name = models;
 			sourceTree = "<group>";
@@ -195,6 +208,8 @@
 				824B89981C1FBB7000078A97 /* viewSize.h */,
 				82532E251C264E1700A80448 /* RoleView.h */,
 				82532E261C264E1700A80448 /* RoleView.m */,
+				827A3D371C2BE55A00FE80F5 /* ExpressView.h */,
+				827A3D381C2BE55A00FE80F5 /* ExpressView.m */,
 			);
 			name = views;
 			sourceTree = "<group>";
@@ -381,6 +396,7 @@
 			files = (
 				82EBE9B21C185315007515C2 /* AppDelegate.m in Sources */,
 				829514701C1E90240071E634 /* XZCPGharry.m in Sources */,
+				827A3D361C2B8FFB00FE80F5 /* CCActionQueue.m in Sources */,
 				8295146A1C1E8FF90071E634 /* XZCPElephant.m in Sources */,
 				829514761C1E904F0071E634 /* XZCPSoldier.m in Sources */,
 				82EBEA131C1867FC007515C2 /* CCSystemModel.m in Sources */,
@@ -391,6 +407,7 @@
 				82532E1E1C23F8F300A80448 /* Tools.m in Sources */,
 				824B89AA1C2162E600078A97 /* HomeViewController.m in Sources */,
 				824B89B21C22958F00078A97 /* XZButton.m in Sources */,
+				827A3D391C2BE55A00FE80F5 /* ExpressView.m in Sources */,
 				8295146D1C1E90120071E634 /* XZCPHorse.m in Sources */,
 				82532E221C26485900A80448 /* XZVSViewController.m in Sources */,
 				8232ED661C1A6D9800539717 /* CCBoardView.m in Sources */,
@@ -400,6 +417,7 @@
 				82EBEA101C185F99007515C2 /* XZChessPiece.m in Sources */,
 				82532E271C264E1700A80448 /* RoleView.m in Sources */,
 				8232ED631C1A6CE500539717 /* CPView.m in Sources */,
+				827A3D331C2B8E8A00FE80F5 /* CCActionStep.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

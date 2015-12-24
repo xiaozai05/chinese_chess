@@ -8,6 +8,8 @@
 
 #import "CCSystemModel.h"
 
+
+
 @implementation CCSystemModel
 
 
@@ -40,6 +42,8 @@
         //默认没有棋子被选中
         // TODO
         self.currentCP=nil;
+        //创建动作序列容器
+        self.actionQueue=[[CCActionQueue alloc]init];
     }
     return self;
 }
@@ -79,7 +83,18 @@
 }
 
 #pragma mark -吃子动作过程(即替换棋子过程)
--(void)replaceChessPiece:(XZChessPiece*)cp withAnther:(XZChessPiece*)anther{
+
+
+-(void)actionChessPiece:(XZChessPiece *)cp replaceWithAnther:(XZChessPiece*)anther{
+    
+
+    //将本次下标动作加入动作序列容器
+    CCActionStep* step = [[CCActionStep alloc]initWithSrcPosition:anther.position andDstPosition:cp.position andActType:CCACTION_REPLACE andTag:anther.tag andTagOfBeKilled:cp.tag];
+    [self.actionQueue appendActionStep:step];
+    [self chessPiece:cp replaceWithAnther:anther];
+}
+
+-(void)chessPiece:(XZChessPiece*)cp replaceWithAnther:(XZChessPiece*)anther{
     cp.active=NO;// 设置被吃的棋子为死亡状态[注意:保留该棋子的死亡位置]
     // 在矩阵上将该位置设为新的棋子anther
     matrix[cp.position.y][cp.position.x]=anther;
@@ -413,7 +428,25 @@
 
 
 #pragma mark -移动棋子的过程
--(void)moveChessPiece:(XZChessPiece*)cp toPosition:(CCPos_t)position{
+-(void)actionChessPiece:(XZChessPiece*)cp moveToPosition:(CCPos_t)position{
+    
+    // 将本次下棋动作加入动作序列容器
+    CCActionStep* step = [[CCActionStep alloc]initWithSrcPosition:cp.position andDstPosition:position andActType:CCACTION_MOVE andTag:cp.tag andTagOfBeKilled:-1];
+    NSLog(@"开始调appendActionStep:");
+    [self.actionQueue appendActionStep:step];
+    
+    [self chessPiece:cp moveToPosition:position];
+    
+//    //在矩阵上的新位置设置该棋子
+//    matrix[position.y][position.x]=cp;
+//    //清除原来的痕迹
+//    matrix[cp.position.y][cp.position.x]=nil;
+//    // 将棋子的位置属性更新
+//    cp.position=position;
+}
+
+#pragma mark -棋子回退到原来的位置
+-(void)chessPiece:(XZChessPiece*)cp moveToPosition:(CCPos_t)position{
     //在矩阵上的新位置设置该棋子
     matrix[position.y][position.x]=cp;
     //清除原来的痕迹
@@ -447,6 +480,14 @@
 #pragma mark -模型中交换当前可下棋的角色
 -(void)exchangeRole{
     self.role=-self.role;
+//    if (self.role==RED_ROLE) {
+//        NSLog(@"************轮到红方下棋*******");
+//    }else{
+//        NSLog(@"************轮到绿方下棋*******");
+//    }
+    NSNumber *isRed = [NSNumber numberWithBool:self.role==RED_ROLE];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"角色切换" object:self userInfo:@{@"isRed":isRed}];
+
 }
 
 
@@ -454,9 +495,9 @@
 -(CCSITUATION_TYPE_t)checkForSituationIfTheChessPiece:(XZChessPiece*)cp MoveToPosition:(CCPos_t)position{
     CCSITUATION_TYPE_t situation;
     CCPos_t srcPos=cp.position;
-    [self moveChessPiece:cp toPosition:position];
+    [self chessPiece:cp moveToPosition:position];
     situation=[self checkForSituation];
-    [self moveChessPiece:cp toPosition:srcPos];
+    [self chessPiece:cp moveToPosition:srcPos];
     return situation;
 }
 
@@ -464,7 +505,8 @@
 -(CCSITUATION_TYPE_t)checkForSituationIfTheChessPiece:(XZChessPiece *)cp killAnther:(XZChessPiece*)anther{
     CCSITUATION_TYPE_t situation;
     CCPos_t srcPos =cp.position;
-    [self replaceChessPiece:anther withAnther:cp];
+//    [self replaceChessPiece:anther withAnther:cp];
+    [self chessPiece:anther replaceWithAnther:cp];
     //                        cp               anther
     /*
      cp.active=NO;// 设置被吃的棋子为死亡状态[注意:保留该棋子的死亡位置]
@@ -510,7 +552,7 @@
     for (int i=0; i<32; i++) {
             XZChessPiece* cp = (XZChessPiece*)self.cpList[i];
             if (cp.active && [self canChessPiece:cp killAntherChessPiece:marshal]) {
-                NSLog(@"....正在被将军...\n");
+//                NSLog(@"....正在被将军...\n");
                 return CCWILL_DEFEATED;
             }
     }
@@ -521,13 +563,112 @@
     for (int i=0; i<32; i++) {
         XZChessPiece* cp = (XZChessPiece*)self.cpList[i];
         if (cp.active && [self canChessPiece:cp killAntherChessPiece:enemyMarshal]) {
-            NSLog(@"...正在将军...\n");
+//            NSLog(@"...正在将军...\n");
             return CCWILLWIN;
         }
     }
-    NSLog(@"没什么...\n");
     // 默认返回空，即正常状态，没有将军，没有被将军   
     return CCNULL;
+}
+
+-(CCActionStep*)backStep{
+    CCActionStep* step =[self.actionQueue actionStepBack];
+    if (!step) {
+        return nil;
+    }
+    if (step.actType==CCACTION_MOVE) {
+        [self chessPiece:[self chessPieceForTag:step.tag] moveToPosition:step.srcPosition];
+    }else if (step.actType==CCACTION_REPLACE){
+        XZChessPiece* cp = [self chessPieceForTag:step.tag];
+        XZChessPiece* deadCp = [self chessPieceForTag:step.tagOfBeKilled];
+        cp.position=step.srcPosition;
+        matrix[cp.position.y][cp.position.x]=cp;
+        deadCp.active=YES;
+        deadCp.position=step.dstPosition;
+        matrix[deadCp.position.y][deadCp.position.x]=deadCp;
+    }
+    self.currentCP=[self chessPieceForTag:step.tag];
+    [self exchangeRole];
+    return step;
+}
+
+
+
+-(CCActionStep*)forwardStep{
+    CCActionStep* step = [self.actionQueue actionStepForward];
+    if (!step) {
+        return nil;
+    }
+    self.currentCP=[self chessPieceForTag:step.tag];
+    if (step.actType==CCACTION_MOVE) {
+        [self chessPiece:self.currentCP moveToPosition:step.dstPosition];
+    }else if(step.actType==CCACTION_REPLACE){
+        XZChessPiece* deadCp =[self chessPieceForTag:step.tagOfBeKilled];
+        [self chessPiece:deadCp replaceWithAnther:self.currentCP];
+        
+    }
+    [self exchangeRole];
+    return step;
+}
+
+-(NSArray *)expressListOfAllSteps{
+    NSMutableArray* array=[NSMutableArray new];
+    for (int i=0; i<self.actionQueue.actionList.count; i++) {
+        CCActionStep* step = self.actionQueue.actionList[i];
+        if (!step) {
+            return nil;
+        }
+        NSMutableString* string = [NSMutableString new];
+        XZChessPiece* cp = [self chessPieceForTag:step.tag];
+        [string appendString:cp.cpName];
+        int x1 = step.srcPosition.x;
+        int y1 = step.srcPosition.y;
+        int x2 = step.dstPosition.x;
+        int y2 = step.dstPosition.y;
+
+        // 如果红方在下
+        if (self.myselfRole==RED_ROLE) {
+            if (cp.role==RED_ROLE) {
+                [string appendFormat:@"%@",NUMBERS[9-x1]];
+                if (y2<y1) {
+                    [string appendString:@"进"];
+                }else if(y2==y1){
+                    [string appendString:@"平"];
+                }else{
+                    [string appendString:@"退"];
+                }
+                if (x1==x2) {
+                    [string appendFormat:@"%@",NUMBERS[abs(y2-y1)] ];
+                }else{
+                    [string appendFormat:@"%@",NUMBERS[9-x2] ];
+                }
+            }else{
+                [string appendFormat:@"%i",x1+1];
+                if (y2<y1) {
+                    [string appendString:@"退"];
+                }else if( y2==y1){
+                    [string appendString:@"平"];
+                }else{
+                    [string appendString:@"进"];
+                }
+                if (x1==x2) {
+                    [string appendFormat:@"%u",abs(y2-y1) ];
+                }else{
+                    [string appendFormat:@"%u",x2+1];
+                }
+            }
+            
+        }else{  //绿方在下
+            
+        }
+        [array addObject:string];
+    }
+    
+    if (array.count==0) {
+        return nil;
+    }
+    NSArray* retArray = [NSArray arrayWithArray:array];
+    return retArray;
 }
 
 @end

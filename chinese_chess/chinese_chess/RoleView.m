@@ -53,8 +53,7 @@
 -(void)displayRedRole{
     self.role=RED_ROLE;
     self.layer.contents=(id)self.redImage.CGImage;
-
-    NSLog(@"完成红色图标设置\n");
+//    NSLog(@"完成红色图标设置\n");
 }
 
 #pragma mark -展示绿方图标
