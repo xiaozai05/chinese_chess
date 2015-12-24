@@ -659,7 +659,35 @@
             }
             
         }else{  //绿方在下
-            
+            if (cp.role==GREEN_ROLE) {
+                [string appendFormat:@"%u",9-x1];
+                if (y2<y1) {
+                    [string appendString:@"进"];
+                }else if(y2==y1){
+                    [string appendString:@"平"];
+                }else{
+                    [string appendString:@"退"];
+                }
+                if (x1==x2) {
+                    [string appendFormat:@"%u",abs(y2-y1) ];
+                }else{
+                    [string appendFormat:@"%u",9-x2 ];
+                }
+            }else{
+                [string appendFormat:@"%@",NUMBERS[x1+1]];
+                if (y2<y1) {
+                    [string appendString:@"退"];
+                }else if( y2==y1){
+                    [string appendString:@"平"];
+                }else{
+                    [string appendString:@"进"];
+                }
+                if (x1==x2) {
+                    [string appendFormat:@"%@",NUMBERS[abs(y2-y1)] ];
+                }else{
+                    [string appendFormat:@"%@",NUMBERS[x2+1]];
+                }
+            }
         }
         [array addObject:string];
     }

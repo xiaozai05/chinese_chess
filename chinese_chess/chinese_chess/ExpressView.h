@@ -8,6 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
+//用于显示棋谱的类
 @interface ExpressView : UIView
 
 @property(nonatomic,retain)UITableView* tableView;

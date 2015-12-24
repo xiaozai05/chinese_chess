@@ -33,7 +33,7 @@
 
 #pragma mark -创建数据模型
 -(void)createData{
-    self.model = [[CCSystemModel alloc]initWithRole:RED_ROLE andPlayModel:SINGLE_PLAY_MODEL];
+    self.model = [[CCSystemModel alloc]initWithRole:GREEN_ROLE andPlayModel:SINGLE_PLAY_MODEL];
 }
 
 #pragma mark -创建UI
