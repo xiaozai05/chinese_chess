@@ -571,6 +571,7 @@
     return CCNULL;
 }
 
+#pragma mark -回退
 -(CCActionStep*)backStep{
     CCActionStep* step =[self.actionQueue actionStepBack];
     if (!step) {
@@ -593,7 +594,7 @@
 }
 
 
-
+#pragma mark -前进
 -(CCActionStep*)forwardStep{
     CCActionStep* step = [self.actionQueue actionStepForward];
     if (!step) {
@@ -611,6 +612,8 @@
     return step;
 }
 
+
+#pragma mark -生成棋谱
 -(NSArray *)expressListOfAllSteps{
     NSMutableArray* array=[NSMutableArray new];
     for (int i=0; i<self.actionQueue.actionList.count; i++) {

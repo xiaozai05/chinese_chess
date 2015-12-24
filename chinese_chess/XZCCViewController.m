@@ -33,15 +33,14 @@
 
 #pragma mark -创建数据模型
 -(void)createData{
-    self.model = [[CCSystemModel alloc]initWithRole:GREEN_ROLE andPlayModel:SINGLE_PLAY_MODEL];
+    //  可以选择以红方或绿方为自己的角色   第二个参数是对战模式:打谱模式
+    self.model = [[CCSystemModel alloc]initWithRole:RED_ROLE andPlayModel:SINGLE_PLAY_MODEL];
 }
 
 #pragma mark -创建UI
 -(void)createUI{
     //添加背景
     self.view.layer.contents=(id)[UIImage imageNamed:@"bg.png"].CGImage;
-    
-    
     self.topRect=[UIView new]; //棋盘上边区域
     self.bottomRect=[UIView new]; //棋盘下边域
     self.boardView=[[CCBoardView alloc]initWithDataSource:self]; //棋盘视图
@@ -152,31 +151,39 @@
 
 // 前进响应
 -(void)redoButtonClicked:(UIButton*)btn{
+    // 调前进方法,此时不是定时器调，所以参数传nil
     [self forwardStep:nil];
 }
 
+#pragma mark -在棋谱中前进的方法，在自动中会用定时器来回调
 -(BOOL)forwardStep:(NSTimer*)timer{
     NSLog(@"定时器在调用...");
    CCActionStep* step =  [self.model forwardStep];
-    if (!step) {
+    if (!step) {// 如果不能前进
         if (timer) {
+            //如果是定时器来回调的本方法，则关闭定时器
             [timer invalidate];
         }
         return NO;
     }
+    // 让之前被选中的视图设置为非选中状态
     [[self.boardView viewIsSelected] becomeUnselected];
     CPView* view1 = (CPView*)[self.boardView viewWithTag:step.tag];
     CPView* view2 = (CPView*)[self.boardView viewWithPosition:step.dstPosition];
+    // 交换两个视图的中心和参数
     [self exchangeCPView:view1 andAntherCPView:view2];
+    // 设置为选中状态
     [view1 becomeSelected];
+    //  如果是吃棋动作
     if (step.actType==CCACTION_REPLACE) {
-        [view2 disappear];
+        [view2 disappear]; //被吃掉的棋子对应的视图要变成透明状态
     }
     return YES;
 }
 
 // 自动前进响应
 -(void)autoButtonClicked:(UIButton*)btn{
+    // 隔一秒让棋局沿着棋谱往前推进
     [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(forwardStep:) userInfo:nil repeats:YES];
 }
 
@@ -364,18 +371,6 @@
 
 #pragma mark -交换两个棋子视图的位置和逻辑坐标
 -(void)exchangeCPView:(CPView*)view andAntherCPView:(CPView*)anther{
-
-#if 0
-    CGPoint temp=view.center;
-    CCPos_t tempPos=view.position;
-    //采用block动画
-    [UIView animateWithDuration:0.3 animations:^(){
-        view.center=anther.center;
-        view.position=anther.position;
-        anther.center=temp;
-        anther.position=tempPos;
-    }];
-#else
     CCPos_t temPos = view.position;
     view.position=anther.position;
     anther.position=temPos;
@@ -386,7 +381,6 @@
     [UIView setAnimationDuration:0.3];
     view.center=temp;
     [UIView commitAnimations];
-#endif
 }
 
 
@@ -415,6 +409,7 @@
     return view;
 }
 
+
 -(void)setCPView:(CPView *)view inIndexX:(int)x andIndexY:(int)y{
     //取出棋子模型
     XZChessPiece* cp = self.model->matrix[y][x];
@@ -441,7 +436,7 @@
 
 }
 
-
+#pragma mark -监听模型中角色切换动作，用于更新角色标志视图
 -(void)getNotification:(NSNotification*)notification{
    NSNumber* num =[notification.userInfo objectForKey:@"isRed"];
     BOOL isRed = [num boolValue];
@@ -452,11 +447,12 @@
     }
 }
 
+#pragma mark -注册到通知中心
 -(void)registerInNotificationCenter{
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(getNotification:) name:@"角色切换" object:nil];
 }
 
-#pragma mark -数据源代理方法
+#pragma mark -UITableView数据源代理方法
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
     return [self.model expressListOfAllSteps].count;
 }

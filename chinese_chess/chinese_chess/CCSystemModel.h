@@ -70,7 +70,7 @@
 -(CCActionStep*)forwardStep;
 
 
-// 生成棋盘
+// 生成棋谱
 -(NSArray*)expressListOfAllSteps;
 
 
