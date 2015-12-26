@@ -380,10 +380,10 @@
     
     CGPoint temp = anther.center;
     anther.center=view.center;
-    [UIView beginAnimations:@"replace view" context:nil];
-    [UIView setAnimationDuration:0.3];
-    view.center=temp;
-    [UIView commitAnimations];
+    //  此处使用 block动画
+    [UIView animateWithDuration:0.3 animations:^(){
+        view.center=temp;
+    }];
 }
 
 
