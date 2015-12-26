@@ -321,6 +321,7 @@
                 // 如果吃子成功
                 if(analyseResult==CCANALYSE_RESULT_OK||analyseResult== CCANALYSE_WILL_KILL_ENEMY){
                     result=YES;
+                    //  在模型中完成吃子动作
                     [_model actionChessPiece:cp replaceWithAnther:_model.currentCP];
                     
                     CPView* activeView = (CPView*)[self.boardView viewWithTag:_model.currentCP.tag];
@@ -328,11 +329,11 @@
                     [self exchangeCPView:activeView andAntherCPView:view];
                     //被吃掉的棋子的视图要消失
                     [view disappear];
+                    // 如果正在将对方军，在视图上提示2秒
                     if (analyseResult==CCANALYSE_WILL_KILL_ENEMY) {
                         [Tools showSpinnerInView:self.view prompt:@"x将军" delay:2];
                     }
-//                    [self.roleRect turnRole];
-                }else if( analyseResult==CCANALYSE_WILL_BE_KILLED){
+                }else if( analyseResult==CCANALYSE_WILL_BE_KILLED){//如果被将军
                     [Tools showSpinnerInView:self.view prompt:@"已被将军" delay:2];
                 }
             }else{
@@ -347,20 +348,22 @@
             return result;
         }
         // 执行分析是否可以移动棋子
-        
         CCANALYSE_RESULT_t analyseResult =[_model analyseForMotionToDestination:view.position];
-        
+        // 根据分析结果来更新视图
+        //                  棋子可以移动                               或者将对方军
         if(analyseResult==CCANALYSE_RESULT_OK||analyseResult==CCANALYSE_WILL_KILL_ENEMY){
             result=YES;
+            //  在模型中将棋子对象做移动
             [_model actionChessPiece:_model.currentCP moveToPosition:view.position];
             CPView* activeView = (CPView*)[self.boardView viewWithTag:_model.currentCP.tag];
-            // 交换两个棋子视图的中心点，整型坐标值等
+            // 在视图中交换两个棋子视图的中心点，整型坐标值等
             [self exchangeCPView:activeView andAntherCPView:view];
-//            [self.roleRect turnRole];
+            //  如果正在将对方军，在视图上提示2秒
             if (analyseResult==CCANALYSE_WILL_KILL_ENEMY) {
                 [Tools showSpinnerInView:self.view prompt:@"将军" delay:2];
             }
-        }else if (analyseResult==CCANALYSE_WILL_BE_KILLED){
+            
+        }else if (analyseResult==CCANALYSE_WILL_BE_KILLED){// 不能移动，且如果移动这一步会导致被将军，在视图上提示2秒
             [Tools showSpinnerInView:self.view prompt:@"已被将军" delay:2];
         }
     }

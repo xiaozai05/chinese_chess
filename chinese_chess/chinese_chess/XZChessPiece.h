@@ -34,11 +34,6 @@
 
 -(id)initWithPosition:(CCPos_t)position andName:(CPName_t)name andPower:(CPPower_t)power andTag:(NSInteger)tag andCPName:(NSString*)cpName;
 
-// 是否能移动到新的位置
--(BOOL) moveToPosition:(CCPos_t)position;
-
-
-
 
 
 

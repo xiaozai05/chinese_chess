@@ -67,9 +67,7 @@ NSString* CPClassNameFormCPName(CPName_t name){
     return self;
 }
 
--(BOOL)moveToPosition:(CCPos_t)position{
-    return YES;
-}
+
 
 -(NSString *)description{
     return [NSString stringWithFormat:@"[%@:%i:(%i,%i):%li]", self.cpName,self.name,self.position.x,self.position.y,self.tag];

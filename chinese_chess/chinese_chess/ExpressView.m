@@ -22,7 +22,7 @@
         self.tableView.center=CGPointMake(self.bounds.size.width/2, self.bounds.size.height/2);
         self.closeButton = [UIButton buttonWithType:UIButtonTypeCustom];
         [self.closeButton addTarget:self action:@selector(closeButtonClick:) forControlEvents:UIControlEventTouchUpInside];
-        [self.closeButton setTitle:@"关闭" forState:UIControlStateNormal];
+        [self.closeButton setTitle:@"关 闭" forState:UIControlStateNormal];
         self.closeButton.backgroundColor=self.backgroundColor;
         [self.closeButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
         self.closeButton.frame=CGRectMake(0, self.bounds.size.height*0.9, self.bounds.size.width, self.bounds.size.height*0.1);
@@ -34,12 +34,13 @@
 
 -(instancetype)initWithDelegate:(id<UITableViewDelegate>)delegate andDataSource:(id<UITableViewDataSource>)dataSource{
     if (self = [self init]) {
-        self.tableView.delegate=delegate;
-        self.tableView.dataSource=dataSource;
+        self.tableView.delegate=delegate; //设置tableView的代理
+        self.tableView.dataSource=dataSource; //设置tableView的数据源代理
     }
     return self;
 }
 
+// 关闭tableView视图对象的方法
 -(void)closeButtonClick:(UIButton*)btn{
     [self removeFromSuperview];
 }

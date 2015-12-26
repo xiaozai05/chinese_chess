@@ -15,7 +15,7 @@
 @interface CPView : UIView
 {
     @private
-    BOOL _selectStatus;
+    BOOL _selectStatus; //选中状态标志,私有成员
 }
 
 @property(nonatomic,retain)UIImage* selectImage; //棋子选中时的图片

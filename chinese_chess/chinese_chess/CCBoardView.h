@@ -34,7 +34,10 @@
 -(id)initWithDataSource:(id<CCBoardViewDataSource>)dataSource;
 -(id)initWithFrame:(CGRect)frame andDataSource:(id<CCBoardViewDataSource>)dataSource;
 
+// 通过位置获取棋子视图对象
 -(CPView*)viewWithPosition:(CCPos_t)position;
+
+// 获取当前被设置为选中状态的视图   
 -(CPView*)viewIsSelected;
 
 

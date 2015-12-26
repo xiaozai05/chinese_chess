@@ -78,7 +78,7 @@
     }
 }
 
-
+#pragma mark -通过位置获取视图对象
 -(CPView *)viewWithPosition:(CCPos_t)position{
     for (CPView* view in self.subviews) {
         if (view.position.x==position.x && view.position.y==position.y) {
@@ -88,6 +88,7 @@
     return nil;
 }
 
+#pragma mark -获取当前被设置为选中状态的视图对象
 -(CPView *)viewIsSelected{
     for (CPView* view  in self.subviews) {
         if ([view isSelected]) {

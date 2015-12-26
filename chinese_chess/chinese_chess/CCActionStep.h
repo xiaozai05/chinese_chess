@@ -9,6 +9,8 @@
 #import <Foundation/Foundation.h>
 #import "common.h"
 
+
+// 每一步下棋动作都被封装成CCActionStep类的对象
 @interface CCActionStep : NSObject
 @property(nonatomic,assign)CCPos_t srcPosition;  //源坐标
 @property(nonatomic,assign)CCPos_t dstPosition;  //目的坐标
